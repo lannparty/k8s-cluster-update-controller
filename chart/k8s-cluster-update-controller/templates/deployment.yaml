@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "{{ .Release.Name }}"
+spec:
+  selector:
+    matchLabels:
+      app: "{{ .Chart.Name }}"
+  template:
+    metadata:
+      labels:
+        app: "{{ .Chart.Name }}"
+    spec:
+      serviceAccountName: "{{ .Release.Name }}"
+      containers:
+      - name: "{{ .Chart.Name }}"
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: "{{ .Values.image.pullPolicy }}"
+        env:
+        - name: DESIREDNODELABEL
+          value: "{{ .Values.desiredNodeLabel}}"
+        - name: EVICTIONWAITTIME
+          value: "{{ .Values.evictionWaitTime }}"
+        - name: VALIDATEWAITTIME
+          value: "{{ .Values.validateWaitTime }}"
+        - name: VITALNAMESPACES
+          value: "{{ .Values.vitalNamespaces }}"
+        - name: EXEMPTPODLABELS
+          value: "{{ .Values.exemptPodLabels }}"
