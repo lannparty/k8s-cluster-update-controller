@@ -44,7 +44,7 @@ func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName s
 	listOptionsModifier := metav1.ListOptions{FieldSelector: "spec.nodeName=" + cordonedNodeName}
 	podList, err := clientset.CoreV1().Pods(v1.NamespaceAll).List(listOptionsModifier)
 	if err != nil {
-		klog.Errorf("List pods on cordoned nodes failed with error %v\n", podList, err)
+		klog.Errorf("List pods on cordoned nodes failed with error: %v, %v\n", podList, err)
 		return err
 	}
 
