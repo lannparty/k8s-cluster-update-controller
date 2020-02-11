@@ -4,6 +4,7 @@ WORKDIR /go/src/github.com/lannparty/k8s-cluster-update-controller
 COPY ./go.mod ./go.sum ./
 COPY cmd cmd
 COPY pkg pkg
+COPY internal internal
 RUN go build cmd/k8s-cluster-update-controller.go
 
 FROM golang:1.12

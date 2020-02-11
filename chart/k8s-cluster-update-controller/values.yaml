@@ -2,7 +2,7 @@ replicas: 1
 
 image:
   repository: lannparty/k8s-cluster-update-controller
-  tag: "1.0"
+  tag: "latest"
   pullPolicy: Always
 
 # How long to wait in seconds between each pod eviction.
@@ -14,9 +14,11 @@ vitalNamespaces: "ilmn-system,kube-system"
 # How long to wait between each vitalNamespaces validation.
 validateWaitTime: 5
 
-# The label to look for the image we want to be on all the clusters.
-# Nodes on the cluster should be labeled with what image they're using in the format "desired-node-label: <IMAGE>". Ex: "desired-node-label: base-lin-blessed-k8s-1.15-debian-ami-20200130120615"
-desiredNodeLabel: base-lin-blessed-k8s-1.15-debian-ami-20200130120615
+# The label to look for the nodes to be updated.
+# For example in the case of AWS AMI updates, nodes on the cluster should be labeled with what image they're using. Ex: "image!=base-lin-blessed-k8s-1.15-debian-ami-20200130120615" << Nodes NOT desired image.
+# Ignore masters. "kubernetes.io/role!=master" << Nodes NOT master.
+# Multiple labels are comma separated.
+targetLabels: "kubernetes.io/role!=master,image!=base-lin-blessed-k8s-1.15-debian-ami-20200130120615"
 
 #Pod labels to exempt from evictions. Comma delimited list, no spaces. Ex: "app:nginx,app:backend"
 exemptPodLabels: "k8s-app:kube-proxy"

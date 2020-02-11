@@ -17,8 +17,8 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         env:
-        - name: DESIREDNODELABEL
-          value: "{{ .Values.desiredNodeLabel}}"
+        - name: TARGETLABELS
+          value: "{{ .Values.targetLabels}}"
         - name: EVICTIONWAITTIME
           value: "{{ .Values.evictionWaitTime }}"
         - name: VALIDATEWAITTIME
