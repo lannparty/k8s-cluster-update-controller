@@ -40,10 +40,10 @@ func main() {
 	var master string
 
 	nodeListWatchOptionsModifier := func(options *metav1.ListOptions) {
-		options.LabelSelector = "kubernetes.io/role!=master,desired-node-label!=" + os.Getenv("DESIREDNODELABEL")
+		options.LabelSelector = os.Getenv("TARGETLABELS")
 	}
 
-	fmt.Println("targetting nodes that do not have desired node image:", os.Getenv("DESIREDNODELABEL"))
+	fmt.Println("targetting nodes with labels :", os.Getenv("TARGETLABELS"))
 
 	flag.StringVar(&kubeconfig, "kubeconfig", "", "absolute path to the kubeconfig file")
 	flag.StringVar(&master, "master", "", "master url")
