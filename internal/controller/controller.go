@@ -54,7 +54,7 @@ func (c *Controller) processNextItem() bool {
 	return true
 }
 
-func (c *Controller) SetSession(clientset *kubernetes.Clientset) {
+func (c *Controller) SetSession(clientset kubernetes.Interface) {
 	c.session = clientset
 }
 
@@ -143,11 +143,17 @@ func (c *Controller) RollingUpdate(obj interface{}) error {
 	// is dependent on the actual instance, to detect that a Pod was recreated with the same name
 	targetNode := obj.(*v1.Node).GetName()
 	evictionWaitTimeVar := os.Getenv("EVICTIONWAITTIME")
+	if evictionWaitTimeVar == "" {
+		evictionWaitTimeVar = "5"
+	}
 	evictionWaitTime, err := strconv.Atoi(evictionWaitTimeVar)
 	if err != nil {
 		return err
 	}
 	validateWaitTimeVar := os.Getenv("VALIDATEWAITTIME")
+	if validateWaitTimeVar == "" {
+		validateWaitTimeVar = "5"
+	}
 	validateWaitTime, err := strconv.Atoi(validateWaitTimeVar)
 	if err != nil {
 		return err
