@@ -27,3 +27,5 @@ spec:
           value: "{{ .Values.vitalNamespaces }}"
         - name: EXEMPTPODLABELS
           value: "{{ .Values.exemptPodLabels }}"
+        - name: EVICTIONSTRATEGY
+          value: "{{ .Values.evictionStrategy }}"
