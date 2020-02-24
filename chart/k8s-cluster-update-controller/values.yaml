@@ -20,5 +20,8 @@ validateWaitTime: 5
 # Multiple labels are comma separated.
 targetLabels: "kubernetes.io/role!=master,image!=base-lin-blessed-k8s-1.15-debian-ami-20200130120615"
 
-#Pod labels to exempt from evictions. Comma delimited list, no spaces. Ex: "app:nginx,app:backend"
+# Pod labels to exempt from evictions. Comma delimited list, no spaces. Ex: "app:nginx,app:backend"
 exemptPodLabels: "k8s-app:kube-proxy"
+
+# What to do if pdb is encountered during eviction. Skip will move on to the next pod, retry will loop indefinitely.
+evictionStrategy: retry

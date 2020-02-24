@@ -74,10 +74,19 @@ func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName s
 		}
 		fmt.Printf("Evicting %v\n", podList.Items[i].Name)
 		err = clientset.CoreV1().Pods(j.Namespace).Evict(podEviction)
-		if err != nil {
-			klog.Errorf("Eviction of pod %s failed with error %v\n", podList.Items[i].Name, err)
-			return err
+		switch os.Getenv("EVICTIONSTRATEGY") {
+		case "retry":
+			if err != nil {
+				klog.Errorf("Eviction of pod %s failed with error %v\n", podList.Items[i].Name, err)
+				return err
+			}
+		case "skip":
+			if err != nil {
+				klog.Errorf("Eviction of pod %s failed with error %v\n", podList.Items[i].Name, err)
+				continue
+			}
 		}
+
 	}
 	return nil
 }
