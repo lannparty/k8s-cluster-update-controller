@@ -58,7 +58,8 @@ func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName s
 				fmt.Printf("Skipping pod %v because it's a Daemonset.\n", podGet.Name)
 				continue
 			}
-		} else if checkExemptLabels(podGet, os.Getenv("EXEMPTPODLABELS")) == true {
+		} 
+                if checkExemptLabels(podGet, os.Getenv("EXEMPTPODLABELS")) == true {
 			fmt.Printf("Skipping eviction of %s because it has one of the exempt labels %v\n", podGet.Name, os.Getenv("EXEMPTPODLABELS"))
 			continue
 		}
