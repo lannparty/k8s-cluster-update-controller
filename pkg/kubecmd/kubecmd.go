@@ -94,11 +94,11 @@ func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName s
 
 func ValidateNamespaces(clientset kubernetes.Interface, namespaces []string) bool {
 	for _, j := range namespaces {
-		optionsModifier := metav1.ListOptions{FieldSelector: "status.phase!=Running"}
+		optionsModifier := metav1.ListOptions{FieldSelector: "status.phase!=Running,status.Phase!=Succeeded"}
 		podList, _ := clientset.CoreV1().Pods(j).List(optionsModifier)
 		if len(podList.Items) != 0 {
 			for _, j := range podList.Items {
-				fmt.Println(j.Name)
+                                fmt.Println(j.Name)
 			}
 			return false
 		}
