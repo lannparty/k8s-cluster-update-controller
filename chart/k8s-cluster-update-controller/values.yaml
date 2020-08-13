@@ -2,13 +2,14 @@ replicas: 1
 
 image:
   repository: lannparty/k8s-cluster-update-controller
-  tag: "1.1"
+  tag: "v1.2"
   pullPolicy: Always
 
 # How long to wait in seconds between each pod eviction.
 evictionWaitTime: 5
 
 # List of namespaces to check for stability after every cordon and eviction. Comma delimited list, no spaces. Ex: "ilmn-system,kube-system"
+# If empty, will check ALL namespaces.
 vitalNamespaces: "ilmn-system,kube-system"
 
 # How long to wait between each vitalNamespaces validation.
