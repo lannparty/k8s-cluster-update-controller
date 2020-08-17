@@ -158,17 +158,31 @@ func (c *Controller) RollingUpdate(obj interface{}) error {
 	if err != nil {
 		return err
 	}
+        retryThresholdVar := os.Getenv("RETRYTHRESHOLD")
+	retryThreshold, err := strconv.Atoi(retryThresholdVar)
+        evictionStrategy := os.Getenv("EVICTIONSTRATEGY")
 	fmt.Printf("Cordoning node %s\n", targetNode)
-	// Set node unscheduable.
+	// Set node unschedulable.
 	err = kubecmd.CordonNode(c.session, targetNode)
 	if err != nil {
 		klog.Errorf("Cordon node %s failed with error %v\n", targetNode, err)
 	}
+        retryCounter := 0
 	for {
 		err = kubecmd.EvictPodsOnCordonedNodes(c.session, targetNode, "v1beta1")
 		time.Sleep(time.Duration(evictionWaitTime) * time.Second)
 		if err != nil {
-			klog.Errorf("Eviction of pods on %s failed with error %v\n", targetNode, err)
+                        if evictionStrategy == "retry" {
+                                retryCounter += 1
+			        klog.Errorf("Eviction of pods on %s failed with error %v, eviction strategy: retry, retry threshold: %v, retry count: %v\n", targetNode, err, retryThreshold, retryCounter)
+                                if retryCounter == retryThreshold {
+			                klog.Errorf("Retry threshold reached. Skipping node.")
+                                        break
+                                }
+                        } else if evictionStrategy == "skip" {
+			        klog.Errorf("Eviction strategy skip. Skipping node.")
+                                break
+                        }
 		} else {
 			break
 		}

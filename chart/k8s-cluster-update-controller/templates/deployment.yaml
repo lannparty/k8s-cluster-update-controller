@@ -19,13 +19,15 @@ spec:
         env:
         - name: TARGETLABELS
           value: "{{ .Values.targetLabels}}"
-        - name: EVICTIONWAITTIME
-          value: "{{ .Values.evictionWaitTime }}"
         - name: VALIDATEWAITTIME
           value: "{{ .Values.validateWaitTime }}"
         - name: VITALNAMESPACES
           value: "{{ .Values.vitalNamespaces }}"
         - name: EXEMPTPODLABELS
-          value: "{{ .Values.exemptPodLabels }}"
+          value: "{{ .Values.eviction.exemptPodLabels }}"
         - name: EVICTIONSTRATEGY
-          value: "{{ .Values.evictionStrategy }}"
+          value: "{{ .Values.eviction.strategy }}"
+        - name: RETRYTHRESHOLD
+          value: "{{ .Values.eviction.threshold }}"
+        - name: EVICTIONWAITTIME
+          value: "{{ .Values.eviction.wait }}"
