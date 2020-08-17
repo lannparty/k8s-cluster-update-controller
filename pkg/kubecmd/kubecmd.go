@@ -41,6 +41,7 @@ func checkExemptLabels(podGet *v1.Pod, exemptLabel string) bool {
 }
 
 func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName string, policyGroupVersion string) error {
+        var podEvictionErr error
 	listOptionsModifier := metav1.ListOptions{FieldSelector: "spec.nodeName=" + cordonedNodeName}
 	podList, err := clientset.CoreV1().Pods(v1.NamespaceAll).List(listOptionsModifier)
 	if err != nil {
@@ -74,22 +75,12 @@ func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName s
 			},
 		}
 		fmt.Printf("Evicting %v\n", podList.Items[i].Name)
-		err = clientset.CoreV1().Pods(j.Namespace).Evict(podEviction)
-		switch os.Getenv("EVICTIONSTRATEGY") {
-		case "retry":
-			if err != nil {
-				klog.Errorf("Eviction of pod %s failed with error %v\n", podList.Items[i].Name, err)
-				return err
-			}
-		case "skip":
-			if err != nil {
-				klog.Errorf("Eviction of pod %s failed with error %v\n", podList.Items[i].Name, err)
-				continue
-			}
+		podEvictionErr = clientset.CoreV1().Pods(j.Namespace).Evict(podEviction)
+		if podEvictionErr != nil {
+			klog.Errorf("Eviction of pod %s on node %s failed with error: %v\n", podList.Items[i].Name, cordonedNodeName, podEvictionErr)
 		}
-
 	}
-	return nil
+	return podEvictionErr
 }
 
 func ValidateNamespaces(clientset kubernetes.Interface, namespaces []string) bool {

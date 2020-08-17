@@ -16,3 +16,6 @@
 
 # Popular IDE extension files
 .vscode/
+
+# Vim swap
+*.swp

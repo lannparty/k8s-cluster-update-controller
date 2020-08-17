@@ -2,15 +2,12 @@ replicas: 1
 
 image:
   repository: lannparty/k8s-cluster-update-controller
-  tag: "v1.2"
+  tag: "v1.3"
   pullPolicy: Always
-
-# How long to wait in seconds between each pod eviction.
-evictionWaitTime: 5
 
 # List of namespaces to check for stability after every cordon and eviction. Comma delimited list, no spaces. Ex: "ilmn-system,kube-system"
 # If empty, will check ALL namespaces.
-vitalNamespaces: "ilmn-system,kube-system"
+vitalNamespaces: "kube-system"
 
 # How long to wait between each vitalNamespaces validation.
 validateWaitTime: 300
@@ -21,8 +18,13 @@ validateWaitTime: 300
 # Multiple labels are comma separated.
 targetLabels: "kubernetes.io/role!=master,image!=nonexistent"
 
-# Pod labels to exempt from evictions. Comma delimited list, no spaces. Ex: "app:nginx,app:backend"
-exemptPodLabels: "k8s-app:kube-proxy"
 
-# What to do if pdb is encountered during eviction. Skip will move on to the next pod, retry will loop indefinitely.
-evictionStrategy: retry
+# What to do if pdb is encountered during eviction. , retry will loop indefinitely.
+eviction:
+  # 'retry' will retry every ${wait} seconds until ${threshold} is reached. 'skip' will move on. Empty threshold will retry infinitely.
+  strategy: retry
+  threshold: 30
+  wait: 5
+
+  # Pod labels to exempt from evictions. Comma delimited list, no spaces. Ex: "app:nginx,app:backend"
+  exemptPodLabels: "k8s-app:kube-proxy,app:k8s-cluster-update-controller"
