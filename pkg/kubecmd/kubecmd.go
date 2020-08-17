@@ -32,10 +32,15 @@ func CordonNode(clientset kubernetes.Interface, nodeName string) error {
 }
 
 func checkExemptLabels(podGet *v1.Pod, exemptLabel string) bool {
-	for _, j := range podGet.Labels {
-		if strings.Contains(exemptLabel, j) {
-			return true
-		}
+        exemptLabelsSplit := strings.Split(exemptLabel, ",")
+	for i, j := range podGet.Labels {
+                podLabel := string(i) + ":" + string(j)
+                for _, value := range exemptLabelsSplit {
+                        if podLabel == value {
+			        fmt.Printf("Skipping eviction of %s because it has exempt label %v\n", podGet.Name, podLabel)
+			        return true
+                        }
+                }
 	}
 	return false
 }
@@ -61,7 +66,6 @@ func EvictPodsOnCordonedNodes(clientset kubernetes.Interface, cordonedNodeName s
 			}
 		} 
                 if checkExemptLabels(podGet, os.Getenv("EXEMPTPODLABELS")) == true {
-			fmt.Printf("Skipping eviction of %s because it has one of the exempt labels %v\n", podGet.Name, os.Getenv("EXEMPTPODLABELS"))
 			continue
 		}
 		podEviction := &policyv1beta1.Eviction{

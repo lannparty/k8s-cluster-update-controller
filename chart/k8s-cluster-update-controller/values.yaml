@@ -2,7 +2,7 @@ replicas: 1
 
 image:
   repository: lannparty/k8s-cluster-update-controller
-  tag: "v1.3"
+  tag: "v1.4"
   pullPolicy: Always
 
 # List of namespaces to check for stability after every cordon and eviction. Comma delimited list, no spaces. Ex: "ilmn-system,kube-system"

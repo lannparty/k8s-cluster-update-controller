@@ -174,7 +174,7 @@ func (c *Controller) RollingUpdate(obj interface{}) error {
 		if err != nil {
                         if evictionStrategy == "retry" {
                                 retryCounter += 1
-			        klog.Errorf("Eviction of pods on %s failed with error %v, eviction strategy: retry, retry threshold: %v, retry count: %v\n", targetNode, err, retryThreshold, retryCounter)
+			        klog.Errorf("Eviction of pods on %s failed, eviction strategy: retry, retry threshold: %v, retry count: %v\n", targetNode, err, retryThreshold, retryCounter)
                                 if retryCounter == retryThreshold {
 			                klog.Errorf("Retry threshold reached. Skipping node.")
                                         break
