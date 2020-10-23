@@ -158,31 +158,45 @@ func (c *Controller) RollingUpdate(obj interface{}) error {
 	if err != nil {
 		return err
 	}
-        retryThresholdVar := os.Getenv("RETRYTHRESHOLD")
+	retryThresholdVar := os.Getenv("RETRYTHRESHOLD")
 	retryThreshold, err := strconv.Atoi(retryThresholdVar)
-        evictionStrategy := os.Getenv("EVICTIONSTRATEGY")
-	fmt.Printf("Cordoning node %s\n", targetNode)
+	evictionStrategy := os.Getenv("EVICTIONSTRATEGY")
+
+	delayCordon, err := strconv.Atoi(os.Getenv("DELAY_CORDON"))
+	if err != nil {
+		delayCordon = 0
+	}
+
+	// Check the age of the node before targeting for cordon
+	creationTime := obj.(*v1.Node).CreationTimestamp.Time
+	before := time.Now().Local().Add(-time.Minute * time.Duration(delayCordon))
+	if !creationTime.Before(before) {
+		klog.Info(fmt.Sprintf("Not cordoning node %s: age of node must be >= %d minutes before it can be targed for cordon", targetNode, delayCordon))
+		return nil
+	}
+
 	// Set node unschedulable.
+	klog.Info(fmt.Sprintf("Cordoning node %s\n", targetNode))
 	err = kubecmd.CordonNode(c.session, targetNode)
 	if err != nil {
 		klog.Errorf("Cordon node %s failed with error %v\n", targetNode, err)
 	}
-        retryCounter := 0
+	retryCounter := 0
 	for {
 		err = kubecmd.EvictPodsOnCordonedNodes(c.session, targetNode, "v1beta1")
 		time.Sleep(time.Duration(evictionWaitTime) * time.Second)
 		if err != nil {
-                        if evictionStrategy == "retry" {
-                                retryCounter += 1
-			        klog.Errorf("Eviction of pods on %s failed, eviction strategy: retry, retry threshold: %v, retry count: %v\n", targetNode, err, retryThreshold, retryCounter)
-                                if retryCounter == retryThreshold {
-			                klog.Errorf("Retry threshold reached. Skipping node.")
-                                        break
-                                }
-                        } else if evictionStrategy == "skip" {
-			        klog.Errorf("Eviction strategy skip. Skipping node.")
-                                break
-                        }
+			if evictionStrategy == "retry" {
+				retryCounter += 1
+				klog.Errorf("Eviction of pods on %s failed, eviction strategy: retry, retry threshold: %v, retry count: %v\n", targetNode, err, retryThreshold, retryCounter)
+				if retryCounter == retryThreshold {
+					klog.Errorf("Retry threshold reached. Skipping node.")
+					break
+				}
+			} else if evictionStrategy == "skip" {
+				klog.Errorf("Eviction strategy skip. Skipping node.")
+				break
+			}
 		} else {
 			break
 		}

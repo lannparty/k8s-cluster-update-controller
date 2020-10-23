@@ -17,6 +17,8 @@ spec:
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: "{{ .Values.image.pullPolicy }}"
         env:
+        - name: DELAY_CORDON
+          value: "{{ .Values.delayCordon }}"
         - name: TARGETLABELS
           value: "{{ .Values.targetLabels}}"
         - name: VALIDATEWAITTIME
