@@ -28,3 +28,6 @@ eviction:
 
   # Pod labels to exempt from evictions. Comma delimited list, no spaces. Ex: "app:nginx,app:backend"
   exemptPodLabels: "k8s-app:kube-proxy,app:k8s-cluster-update-controller"
+
+# Delay cordoning (in minutes) after the node creation timestamp; prevents cordoning too early
+delayCordon: "5"
